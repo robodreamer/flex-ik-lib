@@ -9,8 +9,8 @@ LONG_DESCRIPTION = \
 
 # Setting up
 setup(
-       # the name must match the folder name 'flex-ik-solver'
-        name="flex-ik-solver",
+       # the name must match the folder name 'flexIk'
+        name="flexIk",
         version=VERSION,
         author="Andy Park",
         author_email="<andypark.purdue@email.com>",
