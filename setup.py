@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 DESCRIPTION = "Flexible IK Solver for Redundant Manipulators"
 LONG_DESCRIPTION = "This package contains a flexible inverse kinematics solver for redundant manipulators. \
     It is based on the SNS-IK algorithm, which is a multi-task prioritization algorithm \
-    that can handle joint limits, joint velocity limits, and task velocity limits."
+    that can handle arbitrary limits including joint and Cartesian limits."
 
 # Setting up
 setup(
