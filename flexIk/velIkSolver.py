@@ -1,4 +1,4 @@
-import numpy as npmargins
+import numpy as np
 from numpy.linalg import pinv
 from flexIk.inverseSolver import inv, Types
 from enum import Enum
