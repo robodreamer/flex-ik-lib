@@ -1,5 +1,10 @@
-import numpy as np
+import numpy as npmargins
 from numpy.linalg import pinv
+from flexIk.inverseSolver import inv, Types
+from enum import Enum
+
+class SolverTypes(Enum):
+    ESNS_MT = 1  # Extended-SNS IK with multi-task prioritization
 
 def findScaleFactor(low, upp, a):
     """
@@ -32,6 +37,9 @@ def findScaleFactor(low, upp, a):
             sMin = max(0, low/abs(a))
     return sMax, sMin
 
+def solve(C, limLow, limUpp, dxGoalData, JData, solver = SolverTypes.ESNS_MT, invSolver=None):
+     if (solver == SolverTypes.ESNS_MT):
+        return esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver)
 
 def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver=None):
     """
@@ -63,7 +71,7 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver=None):
 
     # use PINV method if the invMethod not specified
     if invSolver is None:
-        invSolver = lambda A: inverseSolver(A, InverseMethods.PINV)
+        invSolver = lambda A: inv(A, Types.PINV)
 
     # get the number of tasks
     nTask = len(JData)

@@ -20,11 +20,10 @@ setup(
         install_requires=["numpy"], # add any additional packages that
         # needs to be installed along with your package. Eg: 'caer'
 
-        keywords=['python', 'ik', 'inverse kinematics', 'sns', 'sns-ik', 'redundant manipulators', 'robotics', 'robotics research'],
+        keywords=['python', 'ik', 'inverse kinematics', 'sns-ik', 'redundant manipulators'],
         classifiers= [
-            "Development Status :: 3 - Alpha",
-            "Intended Audience :: Education",
-            "Programming Language :: Python :: 2",
+            "Development Status :: 1 - Beta",
+            "Intended Audience :: Research",
             "Programming Language :: Python :: 3",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",

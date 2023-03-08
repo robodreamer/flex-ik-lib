@@ -1,5 +1,4 @@
-Flexible IK Solver
-==================
+# Flexible IK Solver
 
 This library is a Python implementation of extended SNS IK velocity IK solver.
 
