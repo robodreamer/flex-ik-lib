@@ -41,13 +41,13 @@ def findScaleFactor(low, upp, a):
 
 
 def solve(
-    C, limLow, limUpp, dxGoalData, JData, solver=SolverTypes.ESNS_MT, invSolver=None
+    C, limLow, limUpp, dxGoalData, JData, solver=SolverTypes.ESNS_MT, invSolverType=None
 ):
     if solver == SolverTypes.ESNS_MT:
-        return esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver)
+        return esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType)
 
 
-def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver=None):
+def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
     """
     Calculates joint velocities given a set of Jacobians and task goals
     using the inverse kinematics algorithm with velocity-based multi-task
@@ -76,8 +76,10 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolver=None):
     """
 
     # use PINV method if the invMethod not specified
-    if invSolver is None:
+    if invSolverType is None:
         invSolver = lambda A: inv(A, Types.PINV)
+    else:
+        invSolver = lambda A: inv(A, invSolverType)
 
     # get the number of tasks
     nTask = len(JData)

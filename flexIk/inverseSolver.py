@@ -2,12 +2,14 @@ import numpy as np
 from numpy.linalg import pinv
 from enum import Enum
 
+
 class Types(Enum):
     PINV = 1
     DLS = 2
     SRINV = 3
 
-def inv(A, method=Types.PINV, tolerance=1e-4, betaMax=1e-1):
+
+def inv(A, method=Types.PINV, tolerance=1e-1, betaMax=1e-1):
     """
     Compute inverse of matrix A using different methods.
 
@@ -30,7 +32,12 @@ def inv(A, method=Types.PINV, tolerance=1e-4, betaMax=1e-1):
         # method 2: damped least-square inverse
         lambda_val = tolerance
 
-        A_inv = np.matmul(np.transpose(A), np.linalg.inv(np.matmul(A, np.transpose(A)) + lambda_val**2*np.eye(A.shape[0])))
+        A_inv = np.matmul(
+            np.transpose(A),
+            np.linalg.inv(
+                np.matmul(A, np.transpose(A)) + lambda_val**2 * np.eye(A.shape[0])
+            ),
+        )
 
     elif method == Types.SRINV:
         # method 3: singularity-robust inverse base on numerical filtering
@@ -41,23 +48,31 @@ def inv(A, method=Types.PINV, tolerance=1e-4, betaMax=1e-1):
 
         # get the minimum singular value from SVD
         U, S, V = np.linalg.svd(A)
+
         s_min = np.min(S)
 
-        # compute the sume of the output vectors that correspond to
+        # compute the sum of the output vectors that correspond to
         # singular values below the threshold (tolerance)
         u_sum = np.zeros((A.shape[0], A.shape[0]))
         if s_min < tolerance:
             for ind in range(S.size - 1, -1, -1):
-                if s_data[ind] < tolerance:
+                if S[ind] < tolerance:
                     u_sum += np.outer(U[:, ind], U[:, ind])
                 else:
                     break
             # scale beta coefficient with the minimum singular value
             # beta maps to the range of [0, betaMax] depending on the size of
             # minimum singular value with respect to the threshold.
-            beta = (1-(s_min/tolerance)**2)*betaMax
+            beta = (1 - (s_min / tolerance) ** 2) * betaMax
 
         # compute the inverse with beta coefficient
-        A_inv = np.matmul(np.transpose(A), np.linalg.inv(np.matmul(A, np.transpose(A)) + lambda_val**2*np.eye(A.shape[0]) + beta*u_sum))
+        A_inv = np.matmul(
+            np.transpose(A),
+            np.linalg.inv(
+                np.matmul(A, np.transpose(A))
+                + lambda_val**2 * np.eye(A.shape[0])
+                + beta * u_sum
+            ),
+        )
 
     return A_inv
