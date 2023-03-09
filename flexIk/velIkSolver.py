@@ -158,6 +158,7 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
                 # if the projected goal velocity is close to zero, set scale
                 # factor to zero
                 si = 0
+                mclIdx = 0
             else:
                 # compute the scale factor and identify the critical joint
                 a = xdGoalProj
