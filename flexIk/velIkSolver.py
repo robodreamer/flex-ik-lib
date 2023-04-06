@@ -134,25 +134,22 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
             limitExceeded = False
 
             # update PiHat
-            PiHat = (I - invSolver(Ji.dot(PiBar)).dot(Ji)).dot(
-                pinv(Cact.dot(PiPrev), tol)
-            )
-
+            PiHat = (I - invSolver(Ji @ PiBar) @ Ji) @ pinv(Cact @ PiPrev, tol)
             # compute a solution without task scale factor
             dqi = (
                 dqiPrev
-                + invSolver(Ji.dot(PiBar)).dot(dxGoali - Ji.dot(dqiPrev))
-                + PiHat.dot((w - Cact.dot(dqiPrev)))
+                + invSolver(Ji @ PiBar) @ (dxGoali - Ji @ dqiPrev)
+                + PiHat @ (w - Cact @ dqiPrev)
             )
 
             # check whether the solution violates the limits
-            z = C.dot(dqi)
+            z = C @ dqi
             z = np.ravel(z)
             if np.any(z < (limLow - tol)) or np.any(z > (limUpp + tol)):
                 limitExceeded = True
 
             # compute goal velocity projected
-            xdGoalProj = C.dot(invSolver(Ji.dot(PiBar))).dot(dxGoali)
+            xdGoalProj = C @ invSolver(Ji @ PiBar) @ dxGoali
 
             if np.linalg.norm(xdGoalProj) < tol:
                 # if the projected goal velocity is close to zero, set scale
@@ -162,7 +159,7 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
             else:
                 # compute the scale factor and identify the critical joint
                 a = xdGoalProj
-                b = C.dot(dqi) - a.reshape(-1, 1)
+                b = C @ dqi - a.reshape(-1, 1)
 
                 marginL = limLow - np.ravel(b)
                 marginU = limUpp - np.ravel(b)
@@ -189,11 +186,11 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
             if (iTask == 1 or si > 0) and cntLoop < nIterationsMax:
                 scaledDqi = (
                     dqiPrev
-                    + invSolver(Ji.dot(PiBar)).dot((si * dxGoali - Ji.dot(dqiPrev)))
-                    + PiHat.dot(w - Cact.dot(dqiPrev))
+                    + invSolver(Ji @ PiBar) @ (si * dxGoali - Ji @ dqiPrev)
+                    + PiHat @ (w - Cact @ dqiPrev)
                 )
 
-                z = C.dot(scaledDqi)
+                z = C @ scaledDqi
                 z = np.ravel(z)
 
                 limitSatisfied = not (
@@ -211,21 +208,21 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
 
                 w[mclIdx, 0] = min(max(limLow[mclIdx], z[mclIdx]), limUpp[mclIdx])
 
-                PiBar = PiPrev - pinv(Cact.dot(PiPrev), tol).dot(Cact.dot(PiPrev))
+                PiBar = PiPrev - pinv(Cact @ PiPrev, tol) @ Cact @ PiPrev
 
-                taskRank = np.linalg.matrix_rank(Ji.dot(PiBar), tol)
+                taskRank = np.linalg.matrix_rank(Ji @ PiBar, tol)
                 if taskRank < ndxGoal:
                     si = siStar
                     Sact = SactStar
-                    Cact = Sact.dot(C)
+                    Cact = Sact @ C
                     w = wStar
                     PiBar = PiBarStar
                     PiHat = PiHatStar
 
                     dqi = (
                         dqiPrev
-                        + invSolver(Ji.dot(PiBar)).dot((si * dxGoali - Ji.dot(dqiPrev)))
-                        + PiHat.dot(w - Cact.dot(dqiPrev))
+                        + invSolver(Ji @ PiBar) @ (si * dxGoali - Ji @ dqiPrev)
+                        + PiHat @ (w - Cact @ dqiPrev)
                     )
 
                     limitExceeded = False
@@ -243,7 +240,7 @@ def esns_velocity_ik(C, limLow, limUpp, dxGoalData, JData, invSolverType=None):
 
             if si > 0:
                 # update nullspace projection
-                Pi = PiPrev - pinv(Ji.dot(PiPrev), tol).dot(Ji.dot(PiPrev))
+                Pi = PiPrev - pinv(Ji @ PiPrev, tol) @ Ji @ PiPrev
 
         sData[iTask] = si
 

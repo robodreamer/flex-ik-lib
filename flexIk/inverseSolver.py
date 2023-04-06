@@ -32,12 +32,7 @@ def inv(A, method=Types.PINV, tolerance=1e-1, betaMax=1e-1):
         # method 2: damped least-square inverse
         lambda_val = tolerance
 
-        A_inv = np.matmul(
-            np.transpose(A),
-            np.linalg.inv(
-                np.matmul(A, np.transpose(A)) + lambda_val**2 * np.eye(A.shape[0])
-            ),
-        )
+        A_inv = A.T @ np.linalg.inv(A @ A.T + lambda_val**2 * np.eye(A.shape[0]))
 
     elif method == Types.SRINV:
         # method 3: singularity-robust inverse base on numerical filtering
@@ -66,13 +61,8 @@ def inv(A, method=Types.PINV, tolerance=1e-1, betaMax=1e-1):
             beta = (1 - (s_min / tolerance) ** 2) * betaMax
 
         # compute the inverse with beta coefficient
-        A_inv = np.matmul(
-            np.transpose(A),
-            np.linalg.inv(
-                np.matmul(A, np.transpose(A))
-                + lambda_val**2 * np.eye(A.shape[0])
-                + beta * u_sum
-            ),
+        A_inv = A.T @ np.linalg.inv(
+            A @ A.T + lambda_val**2 * np.eye(A.shape[0]) + beta * u_sum
         )
 
     return A_inv
